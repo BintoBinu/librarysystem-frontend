@@ -1,12 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [CommonModule, RouterOutlet],
+  template: `
+    <h1>Library System</h1>
+    <router-outlet></router-outlet>
+  `
 })
-export class App {
-  protected readonly title = signal('library-frontend');
-}
+export class AppComponent {}
