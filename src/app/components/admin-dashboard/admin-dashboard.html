@@ -1,0 +1,64 @@
+<div class="admin-dashboard">
+  <h2 class="title">📘 Admin Dashboard</h2>
+
+  <!-- ✅ Stats Section -->
+  <div class="stats">
+    <div class="stat-item">
+      <h4>Total Books</h4>
+      <p>{{ totalBooks }}</p>
+    </div>
+
+    <div class="stat-item">
+      <h4>Total Stock</h4>
+      <p>{{ totalStock }}</p>
+    </div>
+
+    <div class="stat-item">
+      <h4>Low Stock</h4>
+      <p>{{ lowStockCount }}</p>
+    </div>
+  </div>
+
+  <!-- ✅ Add Book Button -->
+  <div class="add-btn-container">
+    <button class="btn-add" (click)="toggleForm()">
+      {{ showForm ? '✖ Close Form' : '➕ Add New Book' }}
+    </button>
+  </div>
+
+  <!-- ✅ Add/Edit Form -->
+  <div class="form-section" *ngIf="showForm">
+    <h3>{{ editing ? '✏️ Edit Book' : '➕ Add New Book' }}</h3>
+    <form (ngSubmit)="saveBook()" class="book-form">
+      <input type="text" [(ngModel)]="book.title" name="title" placeholder="Book Title" required />
+      <input type="text" [(ngModel)]="book.author" name="author" placeholder="Author" required />
+      <input type="number" [(ngModel)]="book.stock" name="stock" placeholder="Stock" required min="0" />
+      <button type="submit" class="btn-save" [disabled]="loading">
+        {{ editing ? 'Update Book' : 'Add Book' }}
+      </button>
+      <button type="button" class="btn-reset" *ngIf="editing" (click)="resetForm()">Cancel</button>
+    </form>
+  </div>
+
+  <!-- ✅ Search Bar -->
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="🔍 Search books..." />
+  </div>
+
+  <!-- ✅ Book List -->
+  <div *ngIf="loading" class="loading">Loading books...</div>
+
+  <div class="book-list" *ngIf="!loading">
+    <div *ngFor="let b of filterBooks()" class="book-card">
+      <div class="book-details">
+        <h4>{{ b.title }}</h4>
+        <p>{{ b.author }}</p>
+        <span>Stock: <strong>{{ b.stock }}</strong></span>
+      </div>
+      <div class="actions">
+        <button class="btn-edit" (click)="edit(b)">Edit</button>
+        <button class="btn-delete" (click)="delete(b.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -7,29 +7,28 @@ export interface Book {
   title: string;
   author: string;
   stock: number;
+  available?: boolean;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class BookService {
-  private baseUrl = 'http://localhost:8082/api/books';
+  private baseUrl = 'http://localhost:8080/api/books';
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Book[]> {
+  getAllBooks(): Observable<Book[]> {
     return this.http.get<Book[]>(this.baseUrl);
   }
 
-  add(book: Book): Observable<Book> {
+  addBook(book: Book): Observable<Book> {
     return this.http.post<Book>(this.baseUrl, book);
   }
 
-  edit(id: number, book: Book): Observable<Book> {
+  updateBook(id: number, book: Book): Observable<Book> {
     return this.http.put<Book>(`${this.baseUrl}/${id}`, book);
   }
 
-  delete(id: number): Observable<any> {
+  deleteBook(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

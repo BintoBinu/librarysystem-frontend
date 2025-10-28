@@ -1,0 +1,40 @@
+<div class="register-container">
+  <div class="register-card">
+   
+    <h2 class="title">Create Account</h2>
+    <p class="subtitle">Register as a Student</p>
+
+    <form (ngSubmit)="onRegister()" class="form">
+      <input
+        type="text"
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Username"
+        required
+        [disabled]="loading"
+      />
+
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        placeholder="Password"
+        required
+        [disabled]="loading"
+      />
+
+      <button class="btn" [disabled]="loading">
+        
+        <span *ngIf="!loading">Register</span>
+        <span *ngIf="loading" class="spinner"></span>
+      </button>
+    </form>
+
+    <p class="login-link">
+      Already have an account?
+      <a routerLink="/">Login</a>
+    </p>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+  </div>
+</div>

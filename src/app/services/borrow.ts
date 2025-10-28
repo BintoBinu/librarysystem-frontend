@@ -1,32 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Book } from './book';
 
 export interface Borrow {
   id?: number;
-  book: Book;
-  borrowDate: string;
+  student?: any;
+  book?: any;
+  borrowDate?: string;
   returnDate?: string;
+  returned?: boolean;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class BorrowService {
-  private baseUrl = 'http://localhost:8082/api/borrow';
+  private baseUrl = 'http://localhost:8080/api/borrow';
 
   constructor(private http: HttpClient) {}
 
-  getMyBorrows(): Observable<Borrow[]> {
-    return this.http.get<Borrow[]>(`${this.baseUrl}/my`);
-  }
-
-  borrowBook(bookId: number): Observable<Borrow> {
-    return this.http.post<Borrow>(`${this.baseUrl}/${bookId}`, {});
+  borrowBook(userId: number, bookId: number): Observable<Borrow> {
+    return this.http.post<Borrow>(`${this.baseUrl}/borrow?userId=${userId}&bookId=${bookId}`, {});
   }
 
   returnBook(borrowId: number): Observable<Borrow> {
     return this.http.post<Borrow>(`${this.baseUrl}/return/${borrowId}`, {});
+  }
+
+  getBorrowHistory(userId: number): Observable<Borrow[]> {
+    return this.http.get<Borrow[]>(`${this.baseUrl}/history/${userId}`);
+  }
+
+  getAllBorrows(): Observable<Borrow[]> {
+    return this.http.get<Borrow[]>(this.baseUrl);
   }
 }
