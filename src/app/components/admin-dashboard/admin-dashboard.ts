@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Book, BookService } from '../../services/book';
+import { BorrowService } from '../../services/borrow';
+import { AuthService } from '../../services/auth';
+import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -17,31 +20,53 @@ export class AdminDashboardComponent implements OnInit {
   book: Book = { title: '', author: '', stock: 0 };
   editing = false;
   currentId?: number;
-  message = '';
   loading = false;
   searchTerm = '';
   showForm = false;
+  activeView: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students' = 'home';
 
   totalBooks = 0;
   totalStock = 0;
   lowStockCount = 0;
 
-  constructor(private bookService: BookService, private router: Router) {}
+  borrowHistory: any[] = [];
+  filteredHistory: any[] = [];
+  historySearch = '';
+
+  constructor(
+    private bookService: BookService,
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadBooks();
   }
 
+  // ✅ Switch between views
+  setView(view: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students') {
+    this.activeView = view;
+    this.showForm = false;
+    this.editing = false;
+
+    if (view === 'history' || view === 'pending' || view === 'students') {
+      this.loadBorrowHistory();
+    }
+  }
+
+  // ✅ Logout
   logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 
+  // ✅ Toggle form
   toggleForm() {
     this.showForm = !this.showForm;
     if (!this.showForm) this.resetForm();
   }
 
+  // ✅ Load books
   loadBooks() {
     this.loading = true;
     this.bookService.getAllBooks().subscribe({
@@ -54,45 +79,25 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  // ✅ Save or update book
   saveBook() {
     if (!this.book.title.trim() || !this.book.author.trim()) return;
     this.loading = true;
 
-    if (this.editing && this.currentId) {
-      this.bookService.updateBook(this.currentId, this.book).subscribe({
-        next: () => {
-          this.loadBooks();
-          this.resetForm();
-          this.showForm = false;
-          this.loading = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Book Updated!',
-            text: 'The book details have been successfully updated.',
-            timer: 2000,
-            showConfirmButton: false
-          });
-        },
-        error: () => (this.loading = false)
-      });
-    } else {
-      this.bookService.addBook(this.book).subscribe({
-        next: () => {
-          this.loadBooks();
-          this.resetForm();
-          this.showForm = false;
-          this.loading = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Book Added!',
-            text: 'New book has been added successfully.',
-            timer: 2000,
-            showConfirmButton: false
-          });
-        },
-        error: () => (this.loading = false)
-      });
-    }
+    const req = this.editing && this.currentId
+      ? this.bookService.updateBook(this.currentId, this.book)
+      : this.bookService.addBook(this.book);
+
+    req.subscribe({
+      next: () => {
+        this.loadBooks();
+        this.resetForm();
+        this.showForm = false;
+        this.loading = false;
+        Swal.fire('Success', this.editing ? 'Book updated successfully.' : 'New book added successfully.', 'success');
+      },
+      error: () => (this.loading = false)
+    });
   }
 
   edit(b: Book) {
@@ -107,25 +112,18 @@ export class AdminDashboardComponent implements OnInit {
     if (!id) return;
     Swal.fire({
       title: 'Are you sure?',
-      text: 'This book will be permanently deleted!',
+      text: 'This book will be deleted permanently.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#1565c0',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
+      confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
         this.bookService.deleteBook(id).subscribe(() => {
           this.books = this.books.filter(b => b.id !== id);
           this.updateStats();
-          Swal.fire({
-            title: 'Deleted!',
-            text: 'The book has been removed.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-          });
+          Swal.fire('Deleted', 'Book removed successfully.', 'success');
         });
       }
     });
@@ -140,14 +138,52 @@ export class AdminDashboardComponent implements OnInit {
 
   filterBooks() {
     const term = this.searchTerm.toLowerCase();
-    return this.books.filter(
-      (b) => b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term)
-    );
+    return this.books.filter(b => b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term));
   }
 
   updateStats() {
     this.totalBooks = this.books.length;
     this.totalStock = this.books.reduce((sum, b) => sum + b.stock, 0);
-    this.lowStockCount = this.books.filter((b) => b.stock < 5).length;
+    this.lowStockCount = this.books.filter(b => b.stock < 5).length;
+  }
+
+  // ✅ Load Borrow History from backend
+  loadBorrowHistory() {
+    this.loading = true;
+    this.http.get<any[]>('http://localhost:8080/api/admin/users/borrow-details').subscribe({
+      next: (res) => {
+        this.borrowHistory = res;
+        this.filteredHistory = res;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error loading borrow history:', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  // ✅ Search in Borrow History
+  searchHistory() {
+    const term = this.historySearch.toLowerCase();
+    this.filteredHistory = this.borrowHistory.filter(user =>
+      user.username.toLowerCase().includes(term) ||
+      user.borrowedBooks.some((book: any) => book.bookTitle.toLowerCase().includes(term))
+    );
+  }
+
+  // ✅ Filter for pending (not returned) books
+  getPendingBooks() {
+    return this.borrowHistory
+      .map(user => ({
+        username: user.username,
+        borrowedBooks: user.borrowedBooks.filter((b: any) => !b.isReturned)
+      }))
+      .filter(user => user.borrowedBooks.length > 0);
+  }
+
+  // ✅ Filter for students only
+  getStudentList() {
+    return this.borrowHistory.filter(user => user.role === 'STUDENT');
   }
 }

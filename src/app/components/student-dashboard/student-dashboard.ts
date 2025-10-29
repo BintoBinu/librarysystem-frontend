@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-student-dashboard',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './student-dashboard.html',
   styleUrls: ['./student-dashboard.css']
 })
@@ -22,8 +22,6 @@ export class StudentDashboardComponent implements OnInit {
   loading = false;
   searchQuery = '';
   studentName = '';
-  
-
 
   constructor(
     private bookService: BookService,
@@ -33,6 +31,18 @@ export class StudentDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.studentName = this.authService.getUsername() || 'Student';
+
+    // ✅ Restore last active section on refresh
+    const savedSection = localStorage.getItem('activeSection');
+    if (
+      savedSection === 'books' ||
+      savedSection === 'borrowed' ||
+      savedSection === 'return' ||
+      savedSection === 'history'
+    ) {
+      this.activeSection = savedSection;
+    }
+
     this.loadBooks();
     this.loadBorrowed();
   }
@@ -74,7 +84,7 @@ export class StudentDashboardComponent implements OnInit {
     this.borrowService.getBorrowHistory(Number(userId)).subscribe({
       next: (res) => {
         this.history = res;
-        this.borrowed = res.filter(b => !b.returned);
+        this.borrowed = res.filter((b) => !b.returned);
       },
       error: (err) => console.error('Error loading borrow history:', err)
     });
@@ -115,10 +125,17 @@ export class StudentDashboardComponent implements OnInit {
       }
     });
   }
-  getTotalStock(): number {
-  return this.filteredBooks.reduce((sum, book) => sum + (book.stock || 0), 0);
-}
 
+  // ✅ Calculate total stock
+  getTotalStock(): number {
+    return this.filteredBooks.reduce((sum, book) => sum + (book.stock || 0), 0);
+  }
+
+  // ✅ Switch sections (and remember active one)
+  setActive(section: 'books' | 'borrowed' | 'return' | 'history') {
+    this.activeSection = section;
+    localStorage.setItem('activeSection', section); // 🔹 Remember last section
+  }
 
   // ✅ Logout user
   logout() {
@@ -130,16 +147,11 @@ export class StudentDashboardComponent implements OnInit {
       confirmButtonColor: '#2563eb',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Logout'
-    }).then(result => {
+    }).then((result) => {
       if (result.isConfirmed) {
+        localStorage.removeItem('activeSection'); // 🔹 Clear stored section
         this.authService.logout();
       }
     });
   }
-
-  // ✅ Switch sections
-  
-setActive(section: 'books' | 'borrowed' | 'return' | 'history') {
-  this.activeSection = section;
-}
 }
