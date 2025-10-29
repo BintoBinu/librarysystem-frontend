@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth';
 
 export interface Borrow {
   id?: number;
@@ -13,23 +14,46 @@ export interface Borrow {
 
 @Injectable({ providedIn: 'root' })
 export class BorrowService {
-  private baseUrl = 'http://localhost:8080/api/borrow';
+  // ✅ must be plural — matches backend @RequestMapping("/api/borrows")
+  private baseUrl = 'http://localhost:8080/api/borrows';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
+  private getAuthHeaders() {
+    const token = this.authService.token;
+    return token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+  }
+
+  // ✅ matches: @PostMapping("/borrow") with query params
   borrowBook(userId: number, bookId: number): Observable<Borrow> {
-    return this.http.post<Borrow>(`${this.baseUrl}/borrow?userId=${userId}&bookId=${bookId}`, {});
+    return this.http.post<Borrow>(
+      `${this.baseUrl}/borrow?userId=${userId}&bookId=${bookId}`,
+      {},
+      this.getAuthHeaders()
+    );
   }
 
+  // ✅ matches: @PostMapping("/return/{borrowId}")
   returnBook(borrowId: number): Observable<Borrow> {
-    return this.http.post<Borrow>(`${this.baseUrl}/return/${borrowId}`, {});
+    return this.http.post<Borrow>(
+      `${this.baseUrl}/return/${borrowId}`,
+      {},
+      this.getAuthHeaders()
+    );
   }
 
+  // ✅ matches: @GetMapping("/history/{userId}")
   getBorrowHistory(userId: number): Observable<Borrow[]> {
-    return this.http.get<Borrow[]>(`${this.baseUrl}/history/${userId}`);
+    return this.http.get<Borrow[]>(
+      `${this.baseUrl}/history/${userId}`,
+      this.getAuthHeaders()
+    );
   }
 
+  // ✅ matches: @GetMapping (for Admin)
   getAllBorrows(): Observable<Borrow[]> {
-    return this.http.get<Borrow[]>(this.baseUrl);
+    return this.http.get<Borrow[]>(this.baseUrl, this.getAuthHeaders());
   }
 }

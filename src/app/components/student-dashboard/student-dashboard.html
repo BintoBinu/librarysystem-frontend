@@ -1,1 +1,100 @@
-<p>student-dashboard works!</p>
+<div class="dashboard-container">
+  <!-- ======== NAVBAR (Top Fixed) ======== -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="/librarylogo.png" alt="Library Logo" class="logo-img" />
+      <h1 class="logo-text">Library System</h1>
+    </div>
+
+    <div class="nav-center">
+      <button [class.active]="activeSection === 'books'" (click)="setActive('books')">Books List</button>
+      <button [class.active]="activeSection === 'borrowed'" (click)="setActive('borrowed')">Borrowed Books</button>
+      <button [class.active]="activeSection === 'return'" (click)="setActive('return')">Return Books</button>
+      <button [class.active]="activeSection === 'history'" (click)="setActive('history')">Borrow History</button>
+    </div>
+
+    <div class="nav-right">
+      <input
+        type="text"
+        placeholder="🔍 Search books..."
+        [(ngModel)]="searchQuery"
+        (input)="searchBooks()"
+      />
+      <span class="greeting">Hi, {{ studentName }}</span>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- ======== MAIN CONTENT ======== -->
+  <main class="content">
+    <!-- Available Books Section -->
+    <section *ngIf="activeSection === 'books'">
+      <h2 class="section-title">Available Books</h2>
+
+      <!-- 📊 Stats -->
+      <div class="stats">
+        <div class="stat-card">
+          <h3>Total Books</h3>
+          <p>{{ filteredBooks.length }}</p>
+        </div>
+        <div class="stat-card">
+          <h3>Total Stock</h3>
+          <p>{{ getTotalStock() }}</p>
+        </div>
+      </div>
+
+      <!-- 📚 Book Grid -->
+      <div *ngIf="filteredBooks.length > 0" class="book-grid">
+        <div *ngFor="let book of filteredBooks" class="book-card">
+          <h3>{{ book.title }}</h3>
+          <p>by {{ book.author }}</p>
+          <p>Stock: {{ book.stock }}</p>
+          <button (click)="borrowBook(book.id!)" [disabled]="book.stock === 0">
+            {{ book.stock === 0 ? 'Out of Stock' : 'Borrow' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="filteredBooks.length === 0" class="empty">No books found.</div>
+    </section>
+
+    <!-- Borrowed Books Section -->
+    <section *ngIf="activeSection === 'borrowed'">
+      <h2 class="section-title">Borrowed Books</h2>
+      <div *ngIf="borrowed.length === 0" class="empty-msg">No borrowed books yet.</div>
+      <div class="book-grid">
+        <div *ngFor="let b of borrowed" class="book-card borrowed">
+          <h3>{{ b.book?.title }}</h3>
+          <p>Borrowed on: {{ b.borrowDate | date: 'mediumDate' }}</p>
+          <!-- <button class="return-btn" (click)="returnBook(b.id!)">Return</button> -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Return Books Section -->
+    <section *ngIf="activeSection === 'return'">
+      <h2 class="section-title">Return Books</h2>
+      <div *ngIf="borrowed.length === 0" class="empty-msg">You have no books to return.</div>
+      <div class="book-grid">
+        <div *ngFor="let b of borrowed" class="book-card borrowed">
+          <h3>{{ b.book?.title }}</h3>
+          <p>Borrowed on: {{ b.borrowDate | date: 'mediumDate' }}</p>
+          <button class="return-btn" (click)="returnBook(b.id!)">Return</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Borrow History Section -->
+    <section *ngIf="activeSection === 'history'">
+      <h2 class="section-title">Borrow History</h2>
+      <div *ngIf="history.length === 0" class="empty-msg">No borrow history yet.</div>
+      <div class="book-grid">
+        <div *ngFor="let h of history" class="book-card history" [class.return]="h.returned">
+          <h3>{{ h.book?.title }}</h3>
+          <p>Borrowed: {{ h.borrowDate | date: 'mediumDate' }}</p>
+          <p *ngIf="h.returnDate">Return: {{ h.returnDate | date: 'mediumDate' }}</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
