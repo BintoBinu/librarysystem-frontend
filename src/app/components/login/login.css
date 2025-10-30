@@ -124,6 +124,7 @@ input:focus {
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s;
+  cursor: pointer;
 }
 
 .register a:hover {

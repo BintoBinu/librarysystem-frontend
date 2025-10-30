@@ -30,11 +30,12 @@
 
   <!-- ===== ADD / EDIT FORM ===== -->
   <div class="form-section" *ngIf="showForm">
-    <h3>{{ editing ? '✏️ Edit Book' : '➕ Add New Book' }}</h3>
+    <h3>{{ editing ? 'Edit Book' : 'Add New Book' }}</h3>
     <form (ngSubmit)="saveBook()" class="book-form">
       <input type="text" [(ngModel)]="book.title" name="title" placeholder="Book Title" required />
       <input type="text" [(ngModel)]="book.author" name="author" placeholder="Author" required />
       <input type="number" [(ngModel)]="book.stock" name="stock" placeholder="Stock" min="0" required />
+
       <div class="form-buttons">
         <button type="submit" class="btn-save">{{ editing ? 'Update Book' : 'Add Book' }}</button>
         <button type="button" class="btn-cancel" (click)="resetForm()">Cancel</button>
@@ -67,7 +68,12 @@
   <div *ngIf="activeView === 'history'" class="borrow-history">
     <h2>📚 Borrow History</h2>
     <div class="history-search">
-      <input type="text" [(ngModel)]="historySearch" (input)="searchHistory()" placeholder="🔍 Search by user or book..." />
+      <input
+        type="text"
+        [(ngModel)]="historySearch"
+        (input)="searchHistory()"
+        placeholder="🔍 Search by user or book..."
+      />
     </div>
     <div *ngFor="let user of filteredHistory" class="user-history">
       <h4 class="user-header">👤 {{ user.username }}</h4>
@@ -98,7 +104,7 @@
 
   <!-- ===== STUDENTS ===== -->
   <div *ngIf="activeView === 'students'" class="borrow-history">
-    <h2>🎓 Students & Borrowed Books</h2>
+    <h2>👨‍🎓 Students & Borrowed Books</h2>
     <div *ngFor="let student of getStudentList()" class="user-history">
       <h4 class="user-header">👤 {{ student.username }} (ID: {{ student.userId }})</h4>
       <div *ngIf="student.borrowedBooks.length > 0; else noBooks">
@@ -111,9 +117,16 @@
           </div>
         </div>
       </div>
-      <ng-template #noBooks><p>No borrowed books.</p></ng-template>
+      <ng-template #noBooks>
+        <p>No borrowed books.</p>
+      </ng-template>
     </div>
   </div>
 
+  <!-- ===== LOADING ===== -->
   <div *ngIf="loading" class="loading">Loading...</div>
+  <footer class="footer">
+  <p>Library Management System © 2025 | All Rights Reserved</p>
+</footer>
+
 </div>

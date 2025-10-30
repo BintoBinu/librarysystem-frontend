@@ -37,7 +37,7 @@
 
     <p class="register">
       Don’t have an account?
-      <a routerLink="/register">Register</a>
+      <a (click)="goToRegister()">Register</a>
     </p>
 
     <p class="error" *ngIf="error">{{ error }}</p>

@@ -1,1 +1,17 @@
-<p>book-list works!</p>
+<div class="row">
+  <div class="col-md-4 mb-3" *ngFor="let book of books">
+    <div class="card p-3 shadow-sm">
+      <h5>{{ book.title }}</h5>
+      <p>Author: {{ book.author }}</p>
+      <p>Stock: {{ book.stock }}</p>
+
+      <button *ngIf="showBorrow" class="btn btn-primary" (click)="borrow(book.id)">
+        Borrow
+      </button>
+
+      <button *ngIf="showDelete" class="btn btn-danger" (click)="delete(book.id)">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import Swal from 'sweetalert2';  
 
 @Component({
   selector: 'app-register',
@@ -30,12 +31,28 @@ export class RegisterComponent {
     }).subscribe({
       next: () => {
         this.loading = false;
-        alert('Registration successful! Please login.');
-        this.router.navigate(['/']);
+
+        //  SweetAlert popup instead of normal alert
+        Swal.fire({
+          title: 'Registration Successful ',
+          text: 'Your account has been created successfully. Please log in.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#3085d6'
+        }).then(() => {
+          this.router.navigate(['/']); // redirect to login after OK
+        });
       },
       error: () => {
         this.loading = false;
-        this.error = 'Registration failed. Please try again.';
+
+        //  Error alert
+        Swal.fire({
+          title: 'Error',
+          text: 'Registration failed. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#d33'
+        });
       }
     });
   }

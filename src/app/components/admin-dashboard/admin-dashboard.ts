@@ -43,7 +43,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadBooks();
   }
 
-  // ✅ Switch between views
+  // Switch between views
   setView(view: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students') {
     this.activeView = view;
     this.showForm = false;
@@ -54,19 +54,41 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  // ✅ Logout
-  logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
-  }
+  //Logout with SweetAlert confirmation
+   logout() {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you really want to logout?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#1565c0',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, Logout',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('token');
+      Swal.fire({
+        title: 'Logged Out',
+        text: 'You have been successfully logged out.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        this.router.navigate(['/login']);
+      });
+    }
+  });
+}
 
-  // ✅ Toggle form
+
+  // Toggle form
   toggleForm() {
     this.showForm = !this.showForm;
     if (!this.showForm) this.resetForm();
   }
 
-  // ✅ Load books
+  // Load books
   loadBooks() {
     this.loading = true;
     this.bookService.getAllBooks().subscribe({
@@ -79,7 +101,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  // ✅ Save or update book
+  //  update book
   saveBook() {
     if (!this.book.title.trim() || !this.book.author.trim()) return;
     this.loading = true;
@@ -147,7 +169,7 @@ export class AdminDashboardComponent implements OnInit {
     this.lowStockCount = this.books.filter(b => b.stock < 5).length;
   }
 
-  // ✅ Load Borrow History from backend
+  //  Load Borrow History from backend
   loadBorrowHistory() {
     this.loading = true;
     this.http.get<any[]>('http://localhost:8080/api/admin/users/borrow-details').subscribe({
@@ -163,7 +185,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  // ✅ Search in Borrow History
+  //  Search in Borrow History
   searchHistory() {
     const term = this.historySearch.toLowerCase();
     this.filteredHistory = this.borrowHistory.filter(user =>
@@ -182,7 +204,7 @@ export class AdminDashboardComponent implements OnInit {
       .filter(user => user.borrowedBooks.length > 0);
   }
 
-  // ✅ Filter for students only
+  //  Filter for students only
   getStudentList() {
     return this.borrowHistory.filter(user => user.role === 'STUDENT');
   }

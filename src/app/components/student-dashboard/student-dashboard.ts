@@ -32,7 +32,7 @@ export class StudentDashboardComponent implements OnInit {
   ngOnInit() {
     this.studentName = this.authService.getUsername() || 'Student';
 
-    // ✅ Restore last active section on refresh
+    //  Restore last active section on refresh
     const savedSection = localStorage.getItem('activeSection');
     if (
       savedSection === 'books' ||
@@ -47,7 +47,7 @@ export class StudentDashboardComponent implements OnInit {
     this.loadBorrowed();
   }
 
-  // ✅ Load all books
+  // Load all books
   loadBooks() {
     this.loading = true;
     this.bookService.getAllBooks().subscribe({
@@ -63,7 +63,7 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  // ✅ Filter books
+  //  Filter books
   searchBooks() {
     const query = this.searchQuery.toLowerCase();
     this.filteredBooks = this.books.filter(
@@ -73,7 +73,7 @@ export class StudentDashboardComponent implements OnInit {
     );
   }
 
-  // ✅ Load borrowed books for current user
+  // Load borrowed books for current user
   loadBorrowed() {
     const userId = this.authService.getUserId();
     if (!userId) {
@@ -90,7 +90,7 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  // ✅ Borrow a book
+  // Borrow a book
   borrowBook(bookId: number) {
     const userId = this.authService.getUserId();
     if (!userId) {
@@ -111,7 +111,7 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  // ✅ Return a borrowed book
+  //  Return a borrowed book
   returnBook(borrowId: number) {
     this.borrowService.returnBook(borrowId).subscribe({
       next: () => {
@@ -126,18 +126,18 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  // ✅ Calculate total stock
+  // Calculate total stock
   getTotalStock(): number {
     return this.filteredBooks.reduce((sum, book) => sum + (book.stock || 0), 0);
   }
 
-  // ✅ Switch sections (and remember active one)
+  // Switch 
   setActive(section: 'books' | 'borrowed' | 'return' | 'history') {
     this.activeSection = section;
-    localStorage.setItem('activeSection', section); // 🔹 Remember last section
+    localStorage.setItem('activeSection', section); 
   }
 
-  // ✅ Logout user
+  //Logout user
   logout() {
     Swal.fire({
       title: 'Logout',
@@ -149,7 +149,7 @@ export class StudentDashboardComponent implements OnInit {
       confirmButtonText: 'Logout'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('activeSection'); // 🔹 Clear stored section
+        localStorage.removeItem('activeSection'); 
         this.authService.logout();
       }
     });

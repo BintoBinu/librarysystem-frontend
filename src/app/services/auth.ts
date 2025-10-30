@@ -24,17 +24,17 @@ export class AuthService {
     }
   }
 
-  // ✅ Ensure this runs in a browser
+  // Ensure this runs in a browser
   private isBrowser(): boolean {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
   }
 
-  // ✅ Register new user
+  //  Register new user
   register(data: { username: string; password: string; role: string }): Observable<any> {
     return this.http.post(`${this.baseUrl}/register`, data);
   }
 
-  // ✅ Login user & save info locally
+  //  Login user & save info locally
   login(data: { username: string; password: string }): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data).pipe(
       tap(res => {
@@ -47,7 +47,7 @@ export class AuthService {
     );
   }
 
-  // ✅ Logout completely
+  //  Logout completely
   logout(): void {
     if (this.isBrowser()) {
       localStorage.removeItem('token');
@@ -57,27 +57,27 @@ export class AuthService {
     this.router.navigate(['/']);
   }
 
-  // ✅ Token getter
+  //  Token getter
   get token(): string | null {
     return this.isBrowser() ? localStorage.getItem('token') : null;
   }
 
-  // ✅ Get current user info
+  //  Get current user info
   get currentUser(): LoginResponse | null {
     return this.currentUserSubject.value;
   }
 
-  // ✅ Is user logged in?
+  //  Is user logged in?
   isLoggedIn(): boolean {
     return !!this.token;
   }
 
-  // ✅ Role getter
+  // Role getter
   getUserRole(): string | null {
     return this.currentUser?.role ?? null;
   }
 
-  // ✅ Decode JWT payload safely
+  //  Decode JWT payload safely
   private decodeToken(): any {
     const token = this.token;
     if (!token) return null;
@@ -91,13 +91,13 @@ export class AuthService {
     }
   }
 
-  // ✅ Get username (from token or local user)
+  // Get username (from token or local user)
   getUsername(): string | null {
     const decoded = this.decodeToken();
     return decoded?.sub || this.currentUser?.username || null;
   }
 
-  // ✅ Get userId — fallback to username if missing
+  //  Get userId — fallback to username if missing
   getUserId(): number | string | null {
     const decoded = this.decodeToken();
     if (decoded?.userId) return decoded.userId; // if backend adds userId in token
@@ -107,7 +107,7 @@ export class AuthService {
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser);
-        return parsed.id || parsed.userId || parsed.username || null; // ✅ fallback to username
+        return parsed.id || parsed.userId || parsed.username || null; 
       } catch {
         return null;
       }
