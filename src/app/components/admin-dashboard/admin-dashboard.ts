@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Book, BookService } from '../../services/book';
-import { BorrowService } from '../../services/borrow';
-import { AuthService } from '../../services/auth';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
@@ -17,12 +15,13 @@ import Swal from 'sweetalert2';
 })
 export class AdminDashboardComponent implements OnInit {
   books: Book[] = [];
-  book: Book = { title: '', author: '', stock: 0 };
+  book: Book = { title: '', author: '', stock: 0, imageUrl: '' };
   editing = false;
   currentId?: number;
   loading = false;
   searchTerm = '';
   showForm = false;
+
   activeView: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students' = 'home';
 
   totalBooks = 0;
@@ -43,7 +42,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadBooks();
   }
 
-  // Switch between views
+  //View controller
   setView(view: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students') {
     this.activeView = view;
     this.showForm = false;
@@ -54,45 +53,43 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  //Logout with SweetAlert confirmation
-   logout() {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you really want to logout?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#1565c0',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, Logout',
-    cancelButtonText: 'Cancel'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      localStorage.removeItem('token');
-      Swal.fire({
-        title: 'Logged Out',
-        text: 'You have been successfully logged out.',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
-      }).then(() => {
-        this.router.navigate(['/login']);
-      });
-    }
-  });
-}
+  //logout
+  logout() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to logout?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1565c0',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, Logout'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('token');
+        Swal.fire({
+          title: 'Logged Out',
+          text: 'You have been successfully logged out.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => this.router.navigate(['/login']));
+      }
+    });
+  }
 
-
-  // Toggle form
+  //Toggle Add/edit
   toggleForm() {
     this.showForm = !this.showForm;
     if (!this.showForm) this.resetForm();
   }
 
-  // Load books
+  //Load Books
   loadBooks() {
     this.loading = true;
     this.bookService.getAllBooks().subscribe({
       next: (res) => {
+        console.log("Result: ",res);
+        
         this.books = res;
         this.updateStats();
         this.loading = false;
@@ -101,7 +98,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  //  update book
+  //Update Book
   saveBook() {
     if (!this.book.title.trim() || !this.book.author.trim()) return;
     this.loading = true;
@@ -122,6 +119,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+ //Edit Book
   edit(b: Book) {
     this.book = { ...b };
     this.currentId = b.id;
@@ -130,6 +128,7 @@ export class AdminDashboardComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  //Delete Book
   delete(id?: number) {
     if (!id) return;
     Swal.fire({
@@ -151,25 +150,29 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  //Reset Form
   resetForm() {
-    this.book = { title: '', author: '', stock: 0 };
+    this.book = { title: '', author: '', stock: 0, imageUrl: '' };
     this.editing = false;
     this.currentId = undefined;
-    this.loading = false;
   }
 
+  //Filter Books
   filterBooks() {
     const term = this.searchTerm.toLowerCase();
-    return this.books.filter(b => b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term));
+    return this.books.filter(b =>
+      b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term)
+    );
   }
 
+//Update Stats
   updateStats() {
     this.totalBooks = this.books.length;
     this.totalStock = this.books.reduce((sum, b) => sum + b.stock, 0);
     this.lowStockCount = this.books.filter(b => b.stock < 5).length;
   }
 
-  //  Load Borrow History from backend
+  // Load Borrow History
   loadBorrowHistory() {
     this.loading = true;
     this.http.get<any[]>('http://localhost:8080/api/admin/users/borrow-details').subscribe({
@@ -178,14 +181,10 @@ export class AdminDashboardComponent implements OnInit {
         this.filteredHistory = res;
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error loading borrow history:', err);
-        this.loading = false;
-      }
+      error: () => (this.loading = false)
     });
   }
 
-  //  Search in Borrow History
   searchHistory() {
     const term = this.historySearch.toLowerCase();
     this.filteredHistory = this.borrowHistory.filter(user =>
@@ -194,7 +193,6 @@ export class AdminDashboardComponent implements OnInit {
     );
   }
 
-  // ✅ Filter for pending (not returned) books
   getPendingBooks() {
     return this.borrowHistory
       .map(user => ({
@@ -204,7 +202,6 @@ export class AdminDashboardComponent implements OnInit {
       .filter(user => user.borrowedBooks.length > 0);
   }
 
-  //  Filter for students only
   getStudentList() {
     return this.borrowHistory.filter(user => user.role === 'STUDENT');
   }

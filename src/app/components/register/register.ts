@@ -32,7 +32,7 @@ export class RegisterComponent {
       next: () => {
         this.loading = false;
 
-        //  SweetAlert popup instead of normal alert
+//  Success alert
         Swal.fire({
           title: 'Registration Successful ',
           text: 'Your account has been created successfully. Please log in.',
@@ -40,13 +40,13 @@ export class RegisterComponent {
           confirmButtonText: 'OK',
           confirmButtonColor: '#3085d6'
         }).then(() => {
-          this.router.navigate(['/']); // redirect to login after OK
+          this.router.navigate(['/']); 
         });
       },
       error: () => {
         this.loading = false;
 
-        //  Error alert
+//  Error alert
         Swal.fire({
           title: 'Error',
           text: 'Registration failed. Please try again.',

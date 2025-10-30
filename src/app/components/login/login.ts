@@ -37,8 +37,6 @@ export class LoginComponent {
       }
     });
   }
-
-  // ✅ Added function for Register navigation
   goToRegister() {
     this.router.navigate(['/register']);
   }

@@ -1,34 +1,25 @@
-/* ===========================
-    Overall Layout
-=========================== */
-body,
-html {
+body, html {
   margin: 0;
   padding: 0;
   font-family: "Poppins", sans-serif;
   background: #f8fafc;
 }
 
-.dashboard-container {
-  min-height: 100vh;
-}
-
-/* ===========================
-    Navbar
-=========================== */
+/* ===== NAVBAR ===== */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-   background: linear-gradient(90deg, #1565c0, #2196f3);
-  color: white;
+  height: 70px;
+  background: linear-gradient(90deg, #1565c0, #2196f3);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 28px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  padding: 0 0; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 
 .nav-left {
@@ -52,11 +43,6 @@ html {
   color: white;
 }
 
-.nav-center {
-  display: flex;
-  gap: 10px;
-}
-
 .nav-center button {
   background: transparent;
   border: none;
@@ -65,7 +51,7 @@ html {
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: 0.3s;
 }
 
 .nav-center button:hover,
@@ -87,190 +73,105 @@ html {
   width: 180px;
 }
 
-.greeting {
-  color: #c7d2fe;
-  font-weight: 500;
-}
-
 .logout-btn {
   background: #ef4444;
   color: white;
   border: none;
   padding: 8px 14px;
-  margin-right: 35px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: 0.3s;
 }
 
 .logout-btn:hover {
   background: #dc2626;
 }
 
-/* ===========================
-    Main Content
-=========================== */
+/* Main */
 .content {
   margin-top: 90px;
   padding: 40px;
 }
 
-.section-title {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #1e3a8a;
-  margin-bottom: 20px;
-}
-
-/* ===========================
-    Stats Cards
-=========================== */
-.stats {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-}
-
-.stat-card {
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 18px 28px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  text-align: center;
-  flex: 1;
-  min-width: 180px;
-}
-
-.stat-card h3 {
-  color: #1e3a8a;
-  margin-bottom: 8px;
-  font-size: 1rem;
-}
-
-.stat-card p {
-  color: #2563eb;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-/* ===========================
-    Book Cards Grid
-=========================== */
+/* Book grid - same as Admin */
 .book-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  justify-items: center;
 }
 
 .book-card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.3s ease;
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 210px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .book-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
-.book-card h3 {
-  font-size: 1.1rem;
+.book-img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.book-title {
+  font-size: 1rem;
   font-weight: 600;
-  color: #111827;
-  margin-bottom: 4px;
+  color: #1e3a8a;
+  margin: 6px 0;
 }
 
-.book-card p {
-  font-size: 0.9rem;
-  color: #374151;
-  margin: 3px 0;
+.book-author {
+  color: #555;
+  margin-bottom: 5px;
 }
 
-.book-card button {
+.book-stock {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.borrow-btn, .return-btn {
   background: #2563eb;
   color: white;
   border: none;
-  padding: 8px 12px;
   border-radius: 8px;
-  font-weight: 500;
+  padding: 8px 14px;
   cursor: pointer;
+  transition: 0.3s;
   margin-top: 8px;
-  transition: background 0.3s ease;
 }
 
-.book-card button:hover {
+.borrow-btn:hover, .return-btn:hover {
   background: #1d4ed8;
 }
 
-.empty {
+.empty, .empty-msg {
   text-align: center;
-  color: #64748b;
+  color: #6b7280;
   font-style: italic;
-  margin-top: 40px;
+  margin-top: 30px;
 }
 
-/* ===========================
-    Responsive Design
-=========================== */
-@media (max-width: 1024px) {
-  .nav-center {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .content {
-    padding: 20px;
-    margin-top: 100px;
-  }
-
-  .nav-center {
-    display: none;
-  }
-
-  .nav-right input {
-    width: 120px;
-  }
-
-  .book-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-card {
-    flex: 1 1 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .navbar {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-
-  .logout-btn {
-    margin-right: 0;
-  }
-
-  .book-card {
-    padding: 16px;
-  }
-}
 .footer {
-  text-align: center;
-  padding: 12px;
-    background: linear-gradient(90deg, #1565c0, #2196f3);
-  color: white;
-  font-size: 14px;
   position: fixed;
+  left: 0;
   bottom: 0;
-  width: 100%; height: 25px;
+  width: 100%;
+  background:linear-gradient(90deg, #1565c0, #2196f3);
+  color: white;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 14px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }

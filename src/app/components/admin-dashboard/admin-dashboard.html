@@ -21,20 +21,25 @@
     </div>
   </nav>
 
-  <!-- ===== STATS ===== -->
+  <!-- ===== HOME STATS ===== -->
   <div *ngIf="activeView === 'home'" class="stats">
     <div class="stat-card total"><h3>Total Books</h3><p>{{ totalBooks }}</p></div>
     <div class="stat-card stock"><h3>Total Stock</h3><p>{{ totalStock }}</p></div>
     <div class="stat-card low"><h3>Low Stock</h3><p>{{ lowStockCount }}</p></div>
   </div>
 
-  <!-- ===== ADD / EDIT FORM ===== -->
+  <!-- ===== ADD/EDIT FORM ===== -->
   <div class="form-section" *ngIf="showForm">
     <h3>{{ editing ? 'Edit Book' : 'Add New Book' }}</h3>
     <form (ngSubmit)="saveBook()" class="book-form">
       <input type="text" [(ngModel)]="book.title" name="title" placeholder="Book Title" required />
       <input type="text" [(ngModel)]="book.author" name="author" placeholder="Author" required />
       <input type="number" [(ngModel)]="book.stock" name="stock" placeholder="Stock" min="0" required />
+      <input type="text" [(ngModel)]="book.imageUrl" name="imageUrl" placeholder="Image URL (optional)" />
+
+      <div *ngIf="book.imageUrl" class="image-preview">
+        <img [src]="book.imageUrl" alt="Book Image" style="width:120px; height:auto; margin-top:10px;">
+      </div>
 
       <div class="form-buttons">
         <button type="submit" class="btn-save">{{ editing ? 'Update Book' : 'Add Book' }}</button>
@@ -43,7 +48,7 @@
     </form>
   </div>
 
-  <!-- ===== BOOKS SECTION ===== -->
+  <!-- ===== BOOK LIST ===== -->
   <div *ngIf="activeView !== 'history' && activeView !== 'pending' && activeView !== 'students'">
     <div class="search-bar">
       <input type="text" [(ngModel)]="searchTerm" placeholder="🔍 Search books..." />
@@ -51,6 +56,9 @@
 
     <div *ngIf="!loading" class="book-grid">
       <div *ngFor="let b of filterBooks()" class="book-card">
+        <div *ngIf="b.imageUrl" class="image-preview">
+          <img [src]="b.imageUrl" alt="Book Image" style="width:120px; height:auto; margin-top:10px;">
+        </div>
         <div class="book-info">
           <h4>{{ b.title }}</h4>
           <p>{{ b.author }}</p>
@@ -68,12 +76,7 @@
   <div *ngIf="activeView === 'history'" class="borrow-history">
     <h2>📚 Borrow History</h2>
     <div class="history-search">
-      <input
-        type="text"
-        [(ngModel)]="historySearch"
-        (input)="searchHistory()"
-        placeholder="🔍 Search by user or book..."
-      />
+      <input type="text" [(ngModel)]="historySearch" (input)="searchHistory()" placeholder="🔍 Search by user or book..." />
     </div>
     <div *ngFor="let user of filteredHistory" class="user-history">
       <h4 class="user-header">👤 {{ user.username }}</h4>
@@ -88,7 +91,7 @@
     </div>
   </div>
 
-  <!-- ===== PENDING BOOKS ===== -->
+  <!-- ===== PENDING ===== -->
   <div *ngIf="activeView === 'pending'" class="borrow-history">
     <h2>⏳ Pending (Not Returned)</h2>
     <div *ngFor="let user of getPendingBooks()" class="user-history">
@@ -104,29 +107,19 @@
 
   <!-- ===== STUDENTS ===== -->
   <div *ngIf="activeView === 'students'" class="borrow-history">
-    <h2>👨‍🎓 Students & Borrowed Books</h2>
-    <div *ngFor="let student of getStudentList()" class="user-history">
-      <h4 class="user-header">👤 {{ student.username }} (ID: {{ student.userId }})</h4>
-      <div *ngIf="student.borrowedBooks.length > 0; else noBooks">
-        <div *ngFor="let book of student.borrowedBooks" class="book-list">
-          <div class="book-list-item">
-            <span class="book-title">{{ book.bookTitle }}</span>
-            <span class="book-status" [class.returned]="book.isReturned" [class.pending]="!book.isReturned">
-              {{ book.isReturned ? 'Returned' : 'Pending' }}
-            </span>
-          </div>
-        </div>
+    <h2>👨‍🎓 Students List</h2>
+    <div class="student-list">
+      <div *ngFor="let student of getStudentList()" class="student-item">
+        👤 {{ student.username }} (ID: {{ student.userId }})
       </div>
-      <ng-template #noBooks>
-        <p>No borrowed books.</p>
-      </ng-template>
     </div>
   </div>
 
-  <!-- ===== LOADING ===== -->
   <div *ngIf="loading" class="loading">Loading...</div>
-  <footer class="footer">
-  <p>Library Management System © 2025 | All Rights Reserved</p>
-</footer>
 
+  <footer class="footer">
+    <p>Library Management System © 2025 | All Rights Reserved</p>
+  </footer>
 </div>
+
+
