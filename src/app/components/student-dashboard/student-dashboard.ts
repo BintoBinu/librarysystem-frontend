@@ -140,13 +140,13 @@ export class StudentDashboardComponent implements OnInit {
   //Logout user
   logout() {
     Swal.fire({
-      title: 'Logout',
+      title: ' Logout',
       text: 'Are you sure you want to log out?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Logout'
+      confirmButtonColor: '#ed0b0bff',
+      cancelButtonColor: '#1531d4ff',
+      confirmButtonText: 'Yes Logout'
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem('activeSection'); 

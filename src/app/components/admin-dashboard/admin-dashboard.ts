@@ -60,8 +60,8 @@ export class AdminDashboardComponent implements OnInit {
       text: 'Do you really want to logout?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#1565c0',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#e01616ff',
+      cancelButtonColor: 'rgba(22, 35, 223, 1)',
       confirmButtonText: 'Yes, Logout'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -136,8 +136,8 @@ export class AdminDashboardComponent implements OnInit {
       text: 'This book will be deleted permanently.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#1565c0',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#eb1919ff',
+      cancelButtonColor: 'rgba(14, 62, 206, 1)',
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {

@@ -57,7 +57,7 @@
     <div *ngIf="!loading" class="book-grid">
       <div *ngFor="let b of filterBooks()" class="book-card">
         <div *ngIf="b.imageUrl" class="image-preview">
-          <img [src]="b.imageUrl" alt="Book Image" style="width:120px; height:auto; margin-top:10px;">
+          <img [src]="b.imageUrl" alt="Book Image"  class="image-show">
         </div>
         <div class="book-info">
           <h4>{{ b.title }}</h4>

@@ -110,12 +110,12 @@
 }
 
 .stat-card.stock {
-  background: linear-gradient(135deg, #c2bfc7);
+  background: linear-gradient(135deg, #2d2c2e, #686a6b);
   color: #fff;
 }
 
 .stat-card.low {
-  background: linear-gradient(135deg, #8c7fa2);
+  background: linear-gradient(135deg, #8c7fa2,#615370);
 }
 
 .stat-card:hover {
@@ -443,4 +443,7 @@ html, body {
   font-size: 14px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
-
+.image-show {
+  width:50%;
+  height:80%
+}
