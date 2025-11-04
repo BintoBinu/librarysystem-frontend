@@ -25,11 +25,15 @@
 .nav-left {
   display: flex;
   align-items: center;
+  padding: 10px 30px;
 }
 
 .logo {
   height: 45px;
+  width: 45px;
   margin-right: 10px;
+  border-radius: 50%;
+  background: rgba(198, 228, 242, 0.944);
 }
 
 .logo-text {
@@ -41,13 +45,14 @@
   display: flex;
   gap: 1rem;
   flex: 1; 
-  justify-content: center;
+  justify-content: right;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
   gap: 1rem; 
+  padding-left: 1rem;
   padding-right: 1rem; 
 }
 
@@ -231,6 +236,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  
 }
 
 .book-card:hover {
@@ -444,6 +450,7 @@ html, body {
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 .image-show {
-  width:50%;
-  height:80%
+  width:80%;
+  height:80%;
+   
 }

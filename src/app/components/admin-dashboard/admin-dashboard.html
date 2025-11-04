@@ -74,7 +74,7 @@
 
   <!-- ===== BORROW HISTORY ===== -->
   <div *ngIf="activeView === 'history'" class="borrow-history">
-    <h2>📚 Borrow History</h2>
+    <h2> Borrow History</h2>
     <div class="history-search">
       <input type="text" [(ngModel)]="historySearch" (input)="searchHistory()" placeholder="🔍 Search by user or book..." />
     </div>
@@ -93,7 +93,7 @@
 
   <!-- ===== PENDING ===== -->
   <div *ngIf="activeView === 'pending'" class="borrow-history">
-    <h2>⏳ Pending (Not Returned)</h2>
+    <h2>Pending (Not Returned)</h2>
     <div *ngFor="let user of getPendingBooks()" class="user-history">
       <h4 class="user-header">👤 {{ user.username }}</h4>
       <div *ngFor="let book of user.borrowedBooks" class="book-list">
@@ -107,10 +107,10 @@
 
   <!-- ===== STUDENTS ===== -->
   <div *ngIf="activeView === 'students'" class="borrow-history">
-    <h2>👨‍🎓 Students List</h2>
+    <h2> 👤Students List</h2>
     <div class="student-list">
       <div *ngFor="let student of getStudentList()" class="student-item">
-        👤 {{ student.username }} (ID: {{ student.userId }})
+         👤{{ student.username }} (ID: {{ student.userId }})
       </div>
     </div>
   </div>

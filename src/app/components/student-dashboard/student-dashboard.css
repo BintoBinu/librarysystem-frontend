@@ -26,13 +26,14 @@ body, html {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 10px 40px;
 }
 
 .logo-img {
-  height: 35px;
-  width: 35px;
+  height: 50px;
+  width: 50px;
   border-radius: 50%;
-  background: white;
+  background: rgba(198, 228, 242, 0.944);
   object-fit: contain;
   padding: 3px;
 }
@@ -41,6 +42,10 @@ body, html {
   font-weight: 700;
   font-size: 1.2rem;
   color: white;
+
+}
+.nav-center {
+  margin-left: 25%;
 }
 
 .nav-center button {
@@ -52,21 +57,25 @@ body, html {
   font-weight: 500;
   cursor: pointer;
   transition: 0.3s;
+  margin-left: 15px;
+  
+
 }
 
 .nav-center button:hover,
 .nav-center button.active {
-  background: #3b82f6;
+  background: #1f5dc0;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
+  margin-right: 30px;
   gap: 10px;
 }
 
 .nav-right input {
-  padding: 6px 10px;
+  padding: 10px 15px;
   border-radius: 6px;
   border: none;
   outline: none;
