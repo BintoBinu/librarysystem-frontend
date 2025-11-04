@@ -110,7 +110,7 @@
     <h2> 👤Students List</h2>
     <div class="student-list">
       <div *ngFor="let student of getStudentList()" class="student-item">
-         👤{{ student.username }} (ID: {{ student.userId }})
+         👤 <span style="margin-left: 15px;">{{ student.username }}</span> (ID: {{ student.userId }})
       </div>
     </div>
   </div>
@@ -121,5 +121,4 @@
     <p>Library Management System © 2025 | All Rights Reserved</p>
   </footer>
 </div>
-
 
