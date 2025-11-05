@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Book, BookService } from '../../services/book';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { Book, BookService } from '../../services/book';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -38,12 +38,14 @@ export class AdminDashboardComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadBooks();
   }
 
-  //View controller
-  setView(view: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students') {
+  
+  // VIEW CONTROLLER
+ 
+  setView(view: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students'): void {
     this.activeView = view;
     this.showForm = false;
     this.editing = false;
@@ -53,8 +55,9 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  //logout
-  logout() {
+  //LOGOUT
+  
+  logout(): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you really want to logout?',
@@ -76,20 +79,16 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
   }
-
-  //Toggle Add/edit
-  toggleForm() {
+  // BOOK OPERATIONS
+  toggleForm(): void {
     this.showForm = !this.showForm;
     if (!this.showForm) this.resetForm();
   }
 
-  //Load Books
-  loadBooks() {
+  loadBooks(): void {
     this.loading = true;
     this.bookService.getAllBooks().subscribe({
       next: (res) => {
-        console.log("Result: ",res);
-        
         this.books = res;
         this.updateStats();
         this.loading = false;
@@ -98,8 +97,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  //Update Book
-  saveBook() {
+  saveBook(): void {
     if (!this.book.title.trim() || !this.book.author.trim()) return;
     this.loading = true;
 
@@ -113,24 +111,27 @@ export class AdminDashboardComponent implements OnInit {
         this.resetForm();
         this.showForm = false;
         this.loading = false;
-        Swal.fire('Success', this.editing ? 'Book updated successfully.' : 'New book added successfully.', 'success');
+        Swal.fire(
+          'Success',
+          this.editing ? 'Book updated successfully.' : 'New book added successfully.',
+          'success'
+        );
       },
       error: () => (this.loading = false)
     });
   }
 
- //Edit Book
-  edit(b: Book) {
-    this.book = { ...b };
-    this.currentId = b.id;
+  edit(book: Book): void {
+    this.book = { ...book };
+    this.currentId = book.id;
     this.editing = true;
     this.showForm = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  //Delete Book
-  delete(id?: number) {
+  delete(id?: number): void {
     if (!id) return;
+
     Swal.fire({
       title: 'Are you sure?',
       text: 'This book will be deleted permanently.',
@@ -150,30 +151,30 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  //Reset Form
-  resetForm() {
+  resetForm(): void {
     this.book = { title: '', author: '', stock: 0, imageUrl: '' };
     this.editing = false;
     this.currentId = undefined;
   }
 
-  //Filter Books
-  filterBooks() {
+  filterBooks(): Book[] {
     const term = this.searchTerm.toLowerCase();
     return this.books.filter(b =>
       b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term)
     );
   }
 
-//Update Stats
-  updateStats() {
+  
+  // STATISTICS
+  updateStats(): void {
     this.totalBooks = this.books.length;
     this.totalStock = this.books.reduce((sum, b) => sum + b.stock, 0);
     this.lowStockCount = this.books.filter(b => b.stock < 5).length;
   }
 
-  // Load Borrow History
-  loadBorrowHistory() {
+ 
+  //  BORROW HISTORY
+  loadBorrowHistory(): void {
     this.loading = true;
     this.http.get<any[]>('http://localhost:8080/api/admin/users/borrow-details').subscribe({
       next: (res) => {
@@ -185,7 +186,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  searchHistory() {
+  searchHistory(): void {
     const term = this.historySearch.toLowerCase();
     this.filteredHistory = this.borrowHistory.filter(user =>
       user.username.toLowerCase().includes(term) ||
@@ -193,7 +194,7 @@ export class AdminDashboardComponent implements OnInit {
     );
   }
 
-  getPendingBooks() {
+  getPendingBooks(): any[] {
     return this.borrowHistory
       .map(user => ({
         username: user.username,
@@ -202,7 +203,7 @@ export class AdminDashboardComponent implements OnInit {
       .filter(user => user.borrowedBooks.length > 0);
   }
 
-  getStudentList() {
+  getStudentList(): any[] {
     return this.borrowHistory.filter(user => user.role === 'STUDENT');
   }
 }
