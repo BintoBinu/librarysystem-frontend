@@ -18,7 +18,7 @@
         type="text"
         placeholder="🔍 Search books..."
         [(ngModel)]="searchQuery"
-        (input)="searchBooks()"
+        (input)="filterBooks()"
       />
       <span class="greeting">Hi, {{ studentName }}</span>
       <button class="logout-btn" (click)="logout()">Logout</button>
@@ -29,7 +29,18 @@
   <main class="content">
     <!-- ===== BOOKS SECTION ===== -->
     <section *ngIf="activeSection === 'books'">
-      <h2 class="section-title">Available Books</h2>
+      <div class="section-header">
+        <h2 class="section-title">Available Books</h2>
+
+        <select
+          [(ngModel)]="selectedCategory"
+          (change)="filterBooks()"
+          class="category-dropdown"
+        >
+          <option value="">All Categories</option>
+          <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+        </select>
+      </div>
 
       <div *ngIf="filteredBooks.length > 0; else noBooks" class="book-grid">
         <div *ngFor="let book of filteredBooks" class="book-card">
@@ -40,8 +51,9 @@
             class="book-img"
           />
           <h3 class="book-title">{{ book.title }}</h3>
-          <p class="book-author">{{ book.author }}</p>
-          <p class="book-stock">Stock: {{ book.stock }}</p>
+          <p>Author: {{ book.author }}</p>
+          <p>Category: {{ book.category }}</p>
+          <p>Stock: {{ book.stock }}</p>
 
           <button
             class="borrow-btn"

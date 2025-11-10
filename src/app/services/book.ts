@@ -9,6 +9,7 @@ export interface Book {
   stock: number;
   available?: boolean;
   imageUrl?: string; 
+  category?: string; 
 }
 
 @Injectable({ providedIn: 'root' })

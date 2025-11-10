@@ -18,6 +18,8 @@ export class StudentDashboardComponent implements OnInit {
   filteredBooks: Book[] = [];
   borrowed: Borrow[] = [];
   history: Borrow[] = [];
+  categories: string[] = [];
+  selectedCategory: string = '';
   activeSection: 'books' | 'borrowed' | 'return' | 'history' = 'books';
   loading = false;
   searchQuery = '';
@@ -32,7 +34,6 @@ export class StudentDashboardComponent implements OnInit {
   ngOnInit() {
     this.studentName = this.authService.getUsername() || 'Student';
 
-    //  Restore last active section on refresh
     const savedSection = localStorage.getItem('activeSection');
     if (
       savedSection === 'books' ||
@@ -54,6 +55,8 @@ export class StudentDashboardComponent implements OnInit {
       next: (res) => {
         this.books = res;
         this.filteredBooks = res;
+        this.categories = [...new Set(res.map((b) => b.category).filter((c): c is string => !!c))];
+
         this.loading = false;
       },
       error: (err) => {
@@ -63,17 +66,20 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  //  Filter books
-  searchBooks() {
+  // Filter books by search and category
+  filterBooks() {
     const query = this.searchQuery.toLowerCase();
-    this.filteredBooks = this.books.filter(
-      (book) =>
+    this.filteredBooks = this.books.filter((book) => {
+      const matchesSearch =
         book.title.toLowerCase().includes(query) ||
-        book.author.toLowerCase().includes(query)
-    );
+        book.author.toLowerCase().includes(query);
+      const matchesCategory =
+        this.selectedCategory === '' || book.category === this.selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
   }
 
-  // Load borrowed books for current user
+  // Load borrowed and history
   loadBorrowed() {
     const userId = this.authService.getUserId();
     if (!userId) {
@@ -111,7 +117,7 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  //  Return a borrowed book
+  // Return a borrowed book
   returnBook(borrowId: number) {
     this.borrowService.returnBook(borrowId).subscribe({
       next: () => {
@@ -126,30 +132,25 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  // Calculate total stock
-  getTotalStock(): number {
-    return this.filteredBooks.reduce((sum, book) => sum + (book.stock || 0), 0);
-  }
-
-  // Switch 
+  // Switch section
   setActive(section: 'books' | 'borrowed' | 'return' | 'history') {
     this.activeSection = section;
-    localStorage.setItem('activeSection', section); 
+    localStorage.setItem('activeSection', section);
   }
 
-  //Logout user
+  // Logout
   logout() {
     Swal.fire({
-      title: ' Logout',
+      title: 'Logout',
       text: 'Are you sure you want to log out?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#ed0b0bff',
       cancelButtonColor: '#1531d4ff',
-      confirmButtonText: 'Yes Logout'
+      confirmButtonText: 'Yes, Logout'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('activeSection'); 
+        localStorage.removeItem('activeSection');
         this.authService.logout();
       }
     });

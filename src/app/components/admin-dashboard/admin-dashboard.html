@@ -1,9 +1,10 @@
 <div class="admin-dashboard">
-  <!-- ===== NAVBAR ===== -->
+
+  <!-- ================= NAVBAR ================= -->
   <nav class="navbar">
     <div class="nav-left">
       <img src="/librarylogo.png" alt="Library Logo" class="logo" />
-      <h1 class="logo-text">Library Admin</h1>
+      <h1 class="logo-text">Library System Admin</h1>
     </div>
 
     <div class="nav-center">
@@ -21,14 +22,14 @@
     </div>
   </nav>
 
-  <!-- ===== HOME STATS ===== -->
+  <!-- ================= HOME STATS ================= -->
   <div *ngIf="activeView === 'home'" class="stats">
     <div class="stat-card total"><h3>Total Books</h3><p>{{ totalBooks }}</p></div>
     <div class="stat-card stock"><h3>Total Stock</h3><p>{{ totalStock }}</p></div>
     <div class="stat-card low"><h3>Low Stock</h3><p>{{ lowStockCount }}</p></div>
   </div>
 
-  <!-- ===== ADD/EDIT FORM ===== -->
+  <!-- ================= ADD / EDIT BOOK FORM ================= -->
   <div class="form-section" *ngIf="showForm">
     <h3>{{ editing ? 'Edit Book' : 'Add New Book' }}</h3>
     <form (ngSubmit)="saveBook()" class="book-form">
@@ -36,6 +37,7 @@
       <input type="text" [(ngModel)]="book.author" name="author" placeholder="Author" required />
       <input type="number" [(ngModel)]="book.stock" name="stock" placeholder="Stock" min="0" required />
       <input type="text" [(ngModel)]="book.imageUrl" name="imageUrl" placeholder="Image URL (optional)" />
+      <input type="text" [(ngModel)]="book.category" name="category" placeholder="Category" required />
 
       <div *ngIf="book.imageUrl" class="image-preview">
         <img [src]="book.imageUrl" alt="Book Image" style="width:120px; height:auto; margin-top:10px;">
@@ -48,22 +50,43 @@
     </form>
   </div>
 
-  <!-- ===== BOOK LIST ===== -->
+  <!-- ================= BOOK LIST ================= -->
   <div *ngIf="activeView !== 'history' && activeView !== 'pending' && activeView !== 'students'">
+
+    <!-- SEARCH + CATEGORY -->
     <div class="search-bar">
-      <input type="text" [(ngModel)]="searchTerm" placeholder="🔍 Search books..." />
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        placeholder="🔍 Search books..."
+        class="search-box"
+      />
+
+      <select
+        [(ngModel)]="selectedCategory"
+        (change)="applyFilters()"
+        class="category-dropdown"
+      >
+        <option value="">All Categories</option>
+        <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+      </select>
     </div>
 
+    <!-- BOOK GRID -->
     <div *ngIf="!loading" class="book-grid">
-      <div *ngFor="let b of filterBooks()" class="book-card">
+      <div *ngFor="let b of filteredBooks" class="book-card">
         <div *ngIf="b.imageUrl" class="image-preview">
-          <img [src]="b.imageUrl" alt="Book Image"  class="image-show">
+          <img [src]="b.imageUrl" alt="Book Image" class="image-show" />
         </div>
+
         <div class="book-info">
-          <h4>{{ b.title }}</h4>
-          <p>{{ b.author }}</p>
-          <span class="stock">Stock: <strong>{{ b.stock }}</strong></span>
+          <h4 class="bookTitle">{{ b.title }}</h4>
+          <p>Author: <span class="stock">{{ b.author }}</span></p>
+          <p>Category: <span class="stock">{{ b.category || 'N/A' }}</span></p>
+          <p>Stock: <span class="stock">{{ b.stock }}</span></p>
         </div>
+
         <div class="actions" *ngIf="activeView !== 'home'">
           <button *ngIf="activeView === 'edit'" class="btn-edit" (click)="edit(b)">Edit</button>
           <button *ngIf="activeView === 'delete'" class="btn-delete" (click)="delete(b.id)">Delete</button>
@@ -72,53 +95,75 @@
     </div>
   </div>
 
-  <!-- ===== BORROW HISTORY ===== -->
+  <!-- ================= BORROW HISTORY ================= -->
   <div *ngIf="activeView === 'history'" class="borrow-history">
-    <h2> Borrow History</h2>
+    <h2>📚 Borrow History</h2>
+
     <div class="history-search">
-      <input type="text" [(ngModel)]="historySearch" (input)="searchHistory()" placeholder="🔍 Search by user or book..." />
+      <input type="text"
+             [(ngModel)]="historySearch"
+             (input)="searchHistory()"
+             placeholder="🔍 Search by user or book..."
+             class="search-box" />
     </div>
+
     <div *ngFor="let user of filteredHistory" class="user-history">
       <h4 class="user-header">👤 {{ user.username }}</h4>
-      <div *ngFor="let book of user.borrowedBooks" class="book-list">
-        <div class="book-list-item">
-          <span class="book-title">{{ book.bookTitle }}</span>
-          <span class="book-status" [class.returned]="book.isReturned" [class.pending]="!book.isReturned">
-            {{ book.isReturned ? 'Returned' : 'Borrowed' }}
-          </span>
-        </div>
+      <div *ngFor="let book of user.borrowedBooks" class="book-list-item">
+        <span class="book-title">{{ book.bookTitle }}</span>
+        <span class="book-status"
+              [class.returned]="book.isReturned"
+              [class.pending]="!book.isReturned">
+          {{ book.isReturned ? 'Returned' : 'Borrowed' }}
+        </span>
       </div>
     </div>
   </div>
 
-  <!-- ===== PENDING ===== -->
+  <!-- ================= PENDING (NOT RETURNED) ================= -->
   <div *ngIf="activeView === 'pending'" class="borrow-history">
     <h2>Pending (Not Returned)</h2>
+
+    <div class="history-search">
+      <input type="text"
+             [(ngModel)]="pendingSearch"
+             placeholder="🔍 Search by student or book..."
+             class="search-box" />
+    </div>
+
     <div *ngFor="let user of getPendingBooks()" class="user-history">
       <h4 class="user-header">👤 {{ user.username }}</h4>
-      <div *ngFor="let book of user.borrowedBooks" class="book-list">
-        <div class="book-list-item">
-          <span class="book-title">{{ book.bookTitle }}</span>
-          <span class="book-status pending">Borrowed</span>
-        </div>
+      <div *ngFor="let book of user.borrowedBooks" class="book-list-item">
+        <span class="book-title">{{ book.bookTitle }}</span>
+        <span class="book-status pending">Borrowed</span>
       </div>
     </div>
   </div>
 
-  <!-- ===== STUDENTS ===== -->
+  <!-- ================= STUDENTS LIST ================= -->
   <div *ngIf="activeView === 'students'" class="borrow-history">
-    <h2> 👤Students List</h2>
+    <h2>👤 Students List</h2>
+
+    <div class="history-search">
+      <input type="text"
+             [(ngModel)]="studentSearch"
+             placeholder="🔍 Search by student name or ID..."
+             class="search-box" />
+    </div>
+
     <div class="student-list">
       <div *ngFor="let student of getStudentList()" class="student-item">
-         👤 <span style="margin-left: 15px;">{{ student.username }}</span> (ID: {{ student.userId }})
+        👤 <span style="margin-left: 15px;">{{ student.username }}</span> (ID: {{ student.userId }})
+        <button class="btn-reset" (click)="resetCredentials(student.userId)">Reset</button>
       </div>
     </div>
   </div>
 
+  <!-- ================= LOADING ================= -->
   <div *ngIf="loading" class="loading">Loading...</div>
 
+  <!-- ================= FOOTER ================= -->
   <footer class="footer">
     <p>Library Management System © 2025 | All Rights Reserved</p>
   </footer>
 </div>
-

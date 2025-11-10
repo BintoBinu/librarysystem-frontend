@@ -1,13 +1,14 @@
+/* ===== GLOBAL STYLES ===== */
 body, html {
   margin: 0;
   padding: 0;
   font-family: "Poppins", sans-serif;
   background: #f8fafc;
 }
-.dashboard-container{
+
+.dashboard-container {
   padding-bottom: 50px;
 }
-
 
 /* ===== NAVBAR ===== */
 .navbar {
@@ -21,7 +22,6 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 0; 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
@@ -46,8 +46,8 @@ body, html {
   font-weight: 700;
   font-size: 1.2rem;
   color: white;
-
 }
+
 .nav-center {
   margin-left: 25%;
 }
@@ -58,13 +58,11 @@ body, html {
   color: white;
   padding: 8px 14px;
   border-radius: 6px;
-   font-weight: 500;
+  font-weight: 500;
   font-size: 1rem;
   cursor: pointer;
   transition: 0.3s;
   margin-left: 15px;
-  
-
 }
 
 .nav-center button:hover,
@@ -86,8 +84,9 @@ body, html {
   outline: none;
   width: 180px;
 }
-.greeting{
-   font-weight: 600;
+
+.greeting {
+  font-weight: 600;
   font-size: 20px;
 }
 
@@ -105,18 +104,56 @@ body, html {
   background: #dc2626;
 }
 
-/* Main */
+/* ===== MAIN CONTENT ===== */
 .content {
   margin-top: 90px;
   padding: 40px;
 }
 
-/* Book grid - same as Admin */
+/* ===== SECTION HEADER (Title + Dropdown) ===== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Title left, dropdown right */
+  margin-bottom: 25px;
+  padding: 0 10px;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 0;
+}
+
+/* ===== CATEGORY DROPDOWN ===== */
+.category-dropdown {
+  padding: 8px 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: linear-gradient(90deg, #1565c0, #2196f3);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  font-weight: 500;
+}
+
+.category-dropdown:hover {
+  background: linear-gradient(90deg, #1f75e6, #42a5f5);
+}
+
+.category-dropdown:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+}
+
+/* ===== BOOK GRID ===== */
 .book-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 25px;
-  justify-items: center;
 }
 
 .book-card {
@@ -124,8 +161,6 @@ body, html {
   border-radius: 12px;
   padding: 18px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
-  width: 210px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -143,7 +178,7 @@ body, html {
 }
 
 .book-title {
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #1e3a8a;
   margin: 6px 0;
@@ -160,7 +195,7 @@ body, html {
 }
 
 .borrow-btn, .return-btn {
-  background: #2563eb;
+  background: #2b67f6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -181,15 +216,33 @@ body, html {
   margin-top: 30px;
 }
 
+/* ===== FOOTER ===== */
 .footer {
   position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
-  background:linear-gradient(90deg, #1565c0, #2196f3);
+  background: linear-gradient(90deg, #1565c0, #2196f3);
   color: white;
   text-align: center;
   padding: 12px 0;
   font-size: 14px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .category-dropdown {
+    width: 100%;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
 }

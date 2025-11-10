@@ -14,49 +14,58 @@ import { Book, BookService } from '../../services/book';
   styleUrls: ['./admin-dashboard.css']
 })
 export class AdminDashboardComponent implements OnInit {
+  // BOOK DATA
   books: Book[] = [];
-  book: Book = { title: '', author: '', stock: 0, imageUrl: '' };
-  editing = false;
+  book: Book = { title: '', author: '', stock: 0, imageUrl: '' , category: ''};
   currentId?: number;
-  loading = false;
-  searchTerm = '';
+  editing = false;
   showForm = false;
+  loading = false;
+  categories: string[] = ['Fiction', 'Anime', 'Adventure', 'Fantasy', 'Novel', 'History', 'Biography' ];
+selectedCategory = '';
+filteredBooks: Book[] = [];
 
+
+
+  // SEARCH & VIEW STATE
+  searchTerm = '';
   activeView: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students' = 'home';
 
+  // STATS
   totalBooks = 0;
   totalStock = 0;
   lowStockCount = 0;
 
+  // BORROW HISTORY DATA
   borrowHistory: any[] = [];
   filteredHistory: any[] = [];
   historySearch = '';
+  pendingSearch = '';
+  studentSearch = '';
 
-  constructor(
+constructor(
     private bookService: BookService,
     private http: HttpClient,
     private router: Router
   ) {}
 
+  //INIT
   ngOnInit(): void {
     this.loadBooks();
   }
 
-  
-  // VIEW CONTROLLER
- 
+  // VIEW CONTROL
   setView(view: 'home' | 'edit' | 'delete' | 'history' | 'pending' | 'students'): void {
     this.activeView = view;
     this.showForm = false;
     this.editing = false;
 
-    if (view === 'history' || view === 'pending' || view === 'students') {
+    if (['history', 'pending', 'students'].includes(view)) {
       this.loadBorrowHistory();
     }
   }
 
-  //LOGOUT
-  
+  //AUTH
   logout(): void {
     Swal.fire({
       title: 'Are you sure?',
@@ -64,7 +73,7 @@ export class AdminDashboardComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#e01616ff',
-      cancelButtonColor: 'rgba(22, 35, 223, 1)',
+      cancelButtonColor: '#1623dfff',
       confirmButtonText: 'Yes, Logout'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -79,11 +88,25 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
   }
-  // BOOK OPERATIONS
+
+  //BOOK CRUD
   toggleForm(): void {
     this.showForm = !this.showForm;
     if (!this.showForm) this.resetForm();
   }
+ 
+
+categoryBooks(): Book[] {
+  const term = this.searchTerm.toLowerCase();
+  return this.books.filter(b => {
+    const matchesSearch =
+      b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term);
+    const matchesCategory =
+      !this.selectedCategory || b.category?.toLowerCase() === this.selectedCategory.toLowerCase();
+    return matchesSearch && matchesCategory;
+  });
+}
+
 
   loadBooks(): void {
     this.loading = true;
@@ -91,6 +114,7 @@ export class AdminDashboardComponent implements OnInit {
       next: (res) => {
         this.books = res;
         this.updateStats();
+         this.filteredBooks = res; 
         this.loading = false;
       },
       error: () => (this.loading = false)
@@ -99,18 +123,19 @@ export class AdminDashboardComponent implements OnInit {
 
   saveBook(): void {
     if (!this.book.title.trim() || !this.book.author.trim()) return;
-    this.loading = true;
 
-    const req = this.editing && this.currentId
+    this.loading = true;
+    const request = this.editing && this.currentId
       ? this.bookService.updateBook(this.currentId, this.book)
       : this.bookService.addBook(this.book);
 
-    req.subscribe({
+    request.subscribe({
       next: () => {
         this.loadBooks();
         this.resetForm();
         this.showForm = false;
         this.loading = false;
+
         Swal.fire(
           'Success',
           this.editing ? 'Book updated successfully.' : 'New book added successfully.',
@@ -138,7 +163,7 @@ export class AdminDashboardComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#eb1919ff',
-      cancelButtonColor: 'rgba(14, 62, 206, 1)',
+      cancelButtonColor: '#0e3ece',
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -164,16 +189,27 @@ export class AdminDashboardComponent implements OnInit {
     );
   }
 
-  
-  // STATISTICS
+  applyFilters(): void {
+  const term = this.searchTerm.toLowerCase();
+  this.filteredBooks = this.books.filter(book => {
+    const matchesSearch =
+      book.title.toLowerCase().includes(term) ||
+      book.author.toLowerCase().includes(term);
+    const matchesCategory =
+      !this.selectedCategory ||
+      (book.category && book.category.toLowerCase() === this.selectedCategory.toLowerCase());
+    return matchesSearch && matchesCategory;
+  });
+}
+
+  //STATS 
   updateStats(): void {
     this.totalBooks = this.books.length;
     this.totalStock = this.books.reduce((sum, b) => sum + b.stock, 0);
     this.lowStockCount = this.books.filter(b => b.stock < 5).length;
   }
 
- 
-  //  BORROW HISTORY
+  //BORROW HISTORY
   loadBorrowHistory(): void {
     this.loading = true;
     this.http.get<any[]>('http://localhost:8080/api/admin/users/borrow-details').subscribe({
@@ -190,20 +226,83 @@ export class AdminDashboardComponent implements OnInit {
     const term = this.historySearch.toLowerCase();
     this.filteredHistory = this.borrowHistory.filter(user =>
       user.username.toLowerCase().includes(term) ||
-      user.borrowedBooks.some((book: any) => book.bookTitle.toLowerCase().includes(term))
+      user.borrowedBooks.some((book: any) =>
+        book.bookTitle.toLowerCase().includes(term)
+      )
     );
   }
-
-  getPendingBooks(): any[] {
-    return this.borrowHistory
+ getPendingBooks(): any[] {
+    const pending = this.borrowHistory
       .map(user => ({
         username: user.username,
         borrowedBooks: user.borrowedBooks.filter((b: any) => !b.isReturned)
       }))
       .filter(user => user.borrowedBooks.length > 0);
+
+    if (!this.pendingSearch.trim()) return pending;
+
+    const term = this.pendingSearch.toLowerCase();
+    return pending.filter(user =>
+      user.username.toLowerCase().includes(term) ||
+      user.borrowedBooks.some((book: any) =>
+        book.bookTitle.toLowerCase().includes(term)
+      )
+    );
   }
 
   getStudentList(): any[] {
-    return this.borrowHistory.filter(user => user.role === 'STUDENT');
+    const students = this.borrowHistory.filter(user => user.role === 'STUDENT');
+
+    if (!this.studentSearch.trim()) return students;
+
+    const term = this.studentSearch.toLowerCase();
+    return students.filter(user =>
+      user.username.toLowerCase().includes(term) ||
+      user.userId.toString().includes(term)
+    );
+  }
+//RESET CREDENTIALS
+  resetCredentials(studentId: number): void {
+    Swal.fire({
+      title: 'Reset Student Credentials',
+      html: `
+        <input id="newUsername" class="swal2-input" placeholder="Enter new username" />
+        <input id="newPassword" type="password" class="swal2-input" placeholder="Enter new password" />
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Reset',
+      cancelButtonText: 'Cancel',
+      focusConfirm: false,
+      preConfirm: () => {
+        const newUsername = (document.getElementById('newUsername') as HTMLInputElement)?.value.trim();
+        const newPassword = (document.getElementById('newPassword') as HTMLInputElement)?.value.trim();
+
+        if (!newUsername || !newPassword) {
+          Swal.showValidationMessage('Please enter both a new username and password.');
+          return false;
+        }
+        return { newUsername, newPassword };
+      }
+    }).then((result) => {
+      if (!result.isConfirmed || !result.value) return;
+
+      const { newUsername, newPassword } = result.value;
+
+      this.http.put(
+        `http://localhost:8080/api/admin/reset/${studentId}?newUsername=${encodeURIComponent(newUsername)}&newPassword=${encodeURIComponent(newPassword)}`,
+        {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      ).subscribe({
+        next: () => {
+          Swal.fire('Success', 'Student credentials updated successfully.', 'success');
+          this.loadBorrowHistory();
+        },
+        error: (err) => {
+          console.error('Reset failed:', err);
+          Swal.fire('Error', 'Failed to reset student credentials. Please try again.', 'error');
+        }
+      });
+    });
   }
 }
+ 
